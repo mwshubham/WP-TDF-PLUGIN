@@ -162,7 +162,10 @@ add_action(
  */
 function get_favorite_post_data(WP_REST_Request $request)
 {
+
+
     $responseData = array();
+    /* Argument might create problem as number post work for the current page only */
     $args = array(
         "numberposts"   => 10,
         "include"       => $request['postIds']
@@ -192,7 +195,6 @@ function get_favorite_post_data(WP_REST_Request $request)
         }
 
        
-
         array_push($responseData, array(
                 "id" => $post -> ID,
                 "date" => $post -> post_date,
@@ -201,10 +203,12 @@ function get_favorite_post_data(WP_REST_Request $request)
                 "excerpt" => $excerpt,
                 "author" => $post -> post_author,
                 "link" => null,
-                "featured_media" => get_post_thumbnail_id($post),
-                "featured_image_thumbnail" => wp_get_attachment_image_src(get_post_thumbnail_id($post), 'thumbnail', true)[0],
+                "featured_image_full" => get_post_thumbnail_id($post),
+                "featured_image_thumb_standard" => wp_get_attachment_image_src(get_post_thumbnail_id($post), 'thumbnail', true)[0],
                 "categories" => $categoryIds,
-                "tags" => $tagIds
+                "tags" => $tagIds,
+                "type" => get_post_type($post -> ID),
+                "status" => get_post_status($post -> ID)
             ));
     }
    
@@ -264,5 +268,166 @@ function get_config_data($data)
     $responseData["isTagsEnabled"] = true;
     $responseData["isShowMinReadTime"] = true;
     $responseData["isShowCustomPages"] = true;
+    $responseData["postCount"] = wp_count_posts()->publish;
     return $responseData;
 }
+
+/**
+ * Admin panel related stuff
+ */
+
+
+/**
+ * @internal never define functions inside callbacks.
+ * these functions could be run multiple times; this would result in a fatal error.
+ */
+ 
+/**
+ * custom option and settings
+ */
+function tdf_settings_init()
+{
+ // register a new setting for "tdf" page
+    register_setting('tdf', 'tdf_options');
+ 
+ // register a new section in the "tdf" page
+    add_settings_section(
+        'tdf_section_developers',
+        __('The Matrix has you.', 'tdf'),
+        'tdf_section_developers_cb',
+        'tdf'
+    );
+ 
+ // register a new field in the "tdf_section_developers" section, inside the "tdf" page
+    add_settings_field(
+        'tdf_field_pill', // as of WP 4.6 this value is used only internally
+        // use $args' label_for to populate the id inside the callback
+        __('Pill', 'tdf'),
+        'tdf_field_pill_cb',
+        'tdf',
+        'tdf_section_developers',
+        [
+        'label_for' => 'tdf_field_pill',
+        'class' => 'tdf_row',
+        'tdf_custom_data' => 'custom',
+        ]
+    );
+}
+ 
+/**
+ * register our tdf_settings_init to the admin_init action hook
+ */
+add_action('admin_init', 'tdf_settings_init');
+ 
+/**
+ * custom option and settings:
+ * callback functions
+ */
+ 
+// developers section cb
+ 
+// section callbacks can accept an $args parameter, which is an array.
+// $args have the following keys defined: title, id, callback.
+// the values are defined at the add_settings_section() function.
+function tdf_section_developers_cb($args)
+{
+    ?>
+ <p id="<?php echo esc_attr($args['id']); ?>"><?php esc_html_e('Follow the white rabbit.', 'tdf'); ?></p>
+    <?php
+}
+ 
+// pill field cb
+ 
+// field callbacks can accept an $args parameter, which is an array.
+// $args is defined at the add_settings_field() function.
+// wordpress has magic interaction with the following keys: label_for, class.
+// the "label_for" key value is used for the "for" attribute of the <label>.
+// the "class" key value is used for the "class" attribute of the <tr> containing the field.
+// you can add custom key value pairs to be used inside your callbacks.
+function tdf_field_pill_cb($args)
+{
+ // get the value of the setting we've registered with register_setting()
+    $options = get_option('tdf_options');
+ // output the field
+    ?>
+ <select id="<?php echo esc_attr($args['label_for']); ?>"
+ data-custom="<?php echo esc_attr($args['tdf_custom_data']); ?>"
+ name="tdf_options[<?php echo esc_attr($args['label_for']); ?>]"
+ >
+ <option value="red" <?php echo isset($options[ $args['label_for'] ]) ? ( selected($options[ $args['label_for'] ], 'red', false) ) : ( '' ); ?>>
+    <?php esc_html_e('red pill', 'tdf'); ?>
+ </option>
+ <option value="blue" <?php echo isset($options[ $args['label_for'] ]) ? ( selected($options[ $args['label_for'] ], 'blue', false) ) : ( '' ); ?>>
+    <?php esc_html_e('blue pill', 'tdf'); ?>
+ </option>
+ </select>
+ <p class="description">
+    <?php esc_html_e('You take the blue pill and the story ends. You wake in your bed and you believe whatever you want to believe.', 'tdf'); ?>
+ </p>
+ <p class="description">
+    <?php esc_html_e('You take the red pill and you stay in Wonderland and I show you how deep the rabbit-hole goes.', 'tdf'); ?>
+ </p>
+    <?php
+}
+ 
+/**
+ * top level menu
+ */
+function tdf_options_page()
+{
+ // add top level menu page
+    add_menu_page(
+        'TechDevFan Options',
+        'TechDevFan',
+        'manage_options',
+        'tdf',
+        'tdf_options_page_html'
+    );
+}
+ 
+/**
+ * register our tdf_options_page to the admin_menu action hook
+ */
+add_action('admin_menu', 'tdf_options_page');
+ 
+/**
+ * top level menu:
+ * callback functions
+ */
+function tdf_options_page_html()
+{
+ // check user capabilities
+    if (! current_user_can('manage_options')) {
+        return;
+    }
+ 
+ // add error/update messages
+ 
+ // check if the user have submitted the settings
+ // wordpress will add the "settings-updated" $_GET parameter to the url
+    if (isset($_GET['settings-updated'])) {
+    // add settings saved message with the class of "updated"
+        add_settings_error('tdf_messages', 'tdf_message', __('Settings Saved', 'tdf'), 'updated');
+    }
+ 
+ // show error/update messages
+    settings_errors('tdf_messages');
+    ?>
+
+    <div class="wrap">
+    <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+    <form action="options.php" method="post">
+    <?php
+ // output security fields for the registered setting "tdf"
+    settings_fields('tdf');
+ // output setting sections and their fields
+ // (sections are registered for "tdf", each field is registered to a specific section)
+    do_settings_sections('tdf');
+ // output save settings button
+    submit_button('Save Settings');
+    ?>
+ </form>
+ </div>
+    <?php
+}
+
