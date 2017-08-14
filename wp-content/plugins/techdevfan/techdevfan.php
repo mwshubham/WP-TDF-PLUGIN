@@ -1,32 +1,32 @@
 <?php
 /**
- * Mobile apps solutions for wordpress.
- *
- * @category  CategoryName
- * @package   TechDevFan
- * @author    admin <mwshubham@gmail.com>
- * @copyright 2017-2018 TechDevFan.com
- * @license   GPL-2.0+ https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
- * @link      CONF_Author_Link
- *
- * Plugin Name: TechDevFan
- * Plugin URI: http://www.techdevfan.com
- * Description: Mobile apps solutions for wordpress.
- * Version: 1.0.0
- * Author: Admin
- * Author URI: http://www.techdevfan.com
- * License: GPL2
- */
+* Mobile apps solutions for wordpress.
+*
+* @category  CategoryName
+* @package   TechDevFan
+* @author    admin <mwshubham@gmail.com>
+* @copyright 2017-2018 TechDevFan.com
+* @license   GPL-2.0+ https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+* @link      CONF_Author_Link
+*
+* Plugin Name: TechDevFan
+* Plugin URI: http://www.techdevfan.com
+* Description: Mobile apps solutions for wordpress.
+* Version: 1.0.0
+* Author: Admin
+* Author URI: http://www.techdevfan.com
+* License: GPL2
+*/
 
 
 $welcome_message = "Welcome to TechDevFan";
 
 add_action('rest_api_init', 'tdf_add_custom_post_data');
 /**
- * Adds Custom post data to api's
- *
- * @return void
- */
+* Adds Custom post data to api's
+*
+* @return void
+*/
 function tdf_add_custom_post_data()
 {
     // Adding featured image 'thumbnail' for each post
@@ -34,9 +34,9 @@ function tdf_add_custom_post_data()
         'post',
         'featured_image_full',
         array(
-            'get_callback' => 'get_featured_image_full',
-            'update_callback' => null,
-            'schema' => null
+        'get_callback' => 'get_featured_image_full',
+        'update_callback' => null,
+        'schema' => null
         )
     );
 
@@ -44,22 +44,22 @@ function tdf_add_custom_post_data()
         'post',
         'featured_image_thumb_standard',
         array(
-            'get_callback' => 'get_featured_image_thumb_standard',
-            'update_callback' => null,
-            'schema' => null
+        'get_callback' => 'get_featured_image_thumb_standard',
+        'update_callback' => null,
+        'schema' => null
         )
     );
 }
 
 /**
- * Adds Custom post data to api's
- *
- * @param post    $post           post object
- * @param field   $field_name     field_name
- * @param Request $request        request
- *
- * @return featured image of the post
- */
+* Adds Custom post data to api's
+*
+* @param post    $post           post object
+* @param field   $field_name     field_name
+* @param Request $request        request
+*
+* @return featured image of the post
+*/
 function get_featured_image_thumb_standard($post, $field_name, $request)
 {
     return wp_get_attachment_image_src($post['featured_media'], 'thumb-standard', false)[0];
@@ -68,28 +68,28 @@ function get_featured_image_thumb_standard($post, $field_name, $request)
 
 
 /**
- * Adds Custom post data to api's
- *
- * @param post    $post           post object
- * @param field   $field_name     field_name
- * @param Request $request        request
- *
- * @return featured image of the post
- */
+* Adds Custom post data to api's
+*
+* @param post    $post           post object
+* @param field   $field_name     field_name
+* @param Request $request        request
+*
+* @return featured image of the post
+*/
 function get_featured_image_full($post, $field_name, $request)
 {
     return wp_get_attachment_image_src($post['featured_media'], 'full', false)[0];
 }
 
-   
+
 /**
- * Filter a response to include only a subset of response fields
- *
- * @param array $response response
- * @param array $fields   fields
- *
- * @return filtered_data
- */
+* Filter a response to include only a subset of response fields
+*
+* @param array $response response
+* @param array $fields   fields
+*
+* @return filtered_data
+*/
 function filter_response_by_fields($response, $fields)
 {
     if (empty($fields) || 0 === count($fields)) {
@@ -108,14 +108,14 @@ function filter_response_by_fields($response, $fields)
 
 
 /**
- * Filter a response to include only a subset of response fields
- *
- * @param array $response response
- * @param array $object   object
- * @param array $request  request
- *
- * @return response
- */
+* Filter a response to include only a subset of response fields
+*
+* @param array $response response
+* @param array $object   object
+* @param array $request  request
+*
+* @return response
+*/
 function tdf_custom_json_fields($response, $object, $request)
 {
     $fields = $request->get_param('fields');
@@ -128,8 +128,8 @@ function tdf_custom_json_fields($response, $object, $request)
 }
 
 /**
- * Url: https://developer.wordpress.org/reference/functions/add_filter/
- */
+* Url: https://developer.wordpress.org/reference/functions/add_filter/
+*/
 add_filter('rest_prepare_post', 'tdf_custom_json_fields', 12, 3);
 add_filter('rest_prepare_category', 'tdf_custom_json_fields', 12, 3);
 add_filter('rest_prepare_page', 'tdf_custom_json_fields', 12, 3);
@@ -155,11 +155,11 @@ add_action(
 );
 
 /**
- * Grab latest post title by an author!
- *
- * @param array $data Options for the function.
- * @return array favorite post based on request $data
- */
+* Grab latest post title by an author!
+*
+* @param array $data Options for the function.
+* @return array favorite post based on request $data
+*/
 function get_favorite_post_data(WP_REST_Request $request)
 {
 
@@ -167,8 +167,8 @@ function get_favorite_post_data(WP_REST_Request $request)
     $responseData = array();
     /* Argument might create problem as number post work for the current page only */
     $args = array(
-        "numberposts"   => 10,
-        "include"       => $request['postIds']
+    "numberposts"   => 10,
+    "include"       => $request['postIds']
     );
 
     $post_arr = get_posts($args);
@@ -176,7 +176,7 @@ function get_favorite_post_data(WP_REST_Request $request)
     foreach ($post_arr as $post) {
         $title["rendered"] = $post -> post_title;
         $content["rendered"] = $post -> post_content;
-        // $excerpt["rendered"] = $post -> post_excerpt;
+    // $excerpt["rendered"] = $post -> post_excerpt;
         $excerpt["rendered"] = get_excerpt_by_id($post -> ID);
 
 
@@ -194,33 +194,33 @@ function get_favorite_post_data(WP_REST_Request $request)
             }
         }
 
-       
+
         array_push($responseData, array(
-                "id" => $post -> ID,
-                "date" => $post -> post_date,
-                "title" => $title,
-                "content" => $content,
-                "excerpt" => $excerpt,
-                "author" => $post -> post_author,
-                "link" => null,
-                "featured_image_full" => get_post_thumbnail_id($post),
-                "featured_image_thumb_standard" => wp_get_attachment_image_src(get_post_thumbnail_id($post), 'thumbnail', true)[0],
-                "categories" => $categoryIds,
-                "tags" => $tagIds,
-                "type" => get_post_type($post -> ID),
-                "status" => get_post_status($post -> ID)
-            ));
+        "id" => $post -> ID,
+        "date" => $post -> post_date,
+        "title" => $title,
+        "content" => $content,
+        "excerpt" => $excerpt,
+        "author" => $post -> post_author,
+        "link" => null,
+        "featured_image_full" => get_post_thumbnail_id($post),
+        "featured_image_thumb_standard" => wp_get_attachment_image_src(get_post_thumbnail_id($post), 'thumbnail', true)[0],
+        "categories" => $categoryIds,
+        "tags" => $tagIds,
+        "type" => get_post_type($post -> ID),
+        "status" => get_post_status($post -> ID)
+        ));
     }
-   
+
     return $responseData;
 }
 
 /**
- * get excerpt by id
- *
- * @param string $post_id id of the post
- * @return the excerpt of the post or create a new one from the content of the post
- */
+* get excerpt by id
+*
+* @param string $post_id id of the post
+* @return the excerpt of the post or create a new one from the content of the post
+*/
 
 function get_excerpt_by_id($post_id)
 {
@@ -255,11 +255,11 @@ add_action(
 );
 
 /**
- * Grab latest post title by an author!
- *
- * @param array $data Options for the function.
- * @return array config data from user
- */
+* Grab latest post title by an author!
+*
+* @param array $data Options for the function.
+* @return array config data from user
+*/
 function get_config_data($data)
 {
     $responseData = array();
@@ -273,32 +273,30 @@ function get_config_data($data)
 }
 
 /**
- * Admin panel related stuff
- */
+* Admin panel related stuff
+*/
 
 
 /**
- * @internal never define functions inside callbacks.
- * these functions could be run multiple times; this would result in a fatal error.
- */
- 
+* @internal never define functions inside callbacks.
+* these functions could be run multiple times; this would result in a fatal error.
+*/
+
 /**
- * custom option and settings
- */
+* custom option and settings
+*/
 function tdf_settings_init()
 {
- // register a new setting for "tdf" page
     register_setting('tdf', 'tdf_options');
- 
- // register a new section in the "tdf" page
+    
     add_settings_section(
         'tdf_section_developers',
-        __('The Matrix has you.', 'tdf'),
+        __('Configuration', 'tdf'),
         'tdf_section_developers_cb',
         'tdf'
     );
- 
- // register a new field in the "tdf_section_developers" section, inside the "tdf" page
+    
+    // register a new field in the "tdf_section_developers" section, inside the "tdf" page
     add_settings_field(
         'tdf_field_pill', // as of WP 4.6 this value is used only internally
         // use $args' label_for to populate the id inside the callback
@@ -313,31 +311,21 @@ function tdf_settings_init()
         ]
     );
 }
- 
+
 /**
- * register our tdf_settings_init to the admin_init action hook
- */
+* register our tdf_settings_init to the admin_init action hook
+*/
 add_action('admin_init', 'tdf_settings_init');
- 
-/**
- * custom option and settings:
- * callback functions
- */
- 
-// developers section cb
- 
-// section callbacks can accept an $args parameter, which is an array.
-// $args have the following keys defined: title, id, callback.
-// the values are defined at the add_settings_section() function.
+
 function tdf_section_developers_cb($args)
 {
     ?>
- <p id="<?php echo esc_attr($args['id']); ?>"><?php esc_html_e('Follow the white rabbit.', 'tdf'); ?></p>
+    <p id="<?php echo esc_attr($args['id']); ?>"><?php esc_html_e('Change configuration that can be used in the application here.', 'tdf'); ?></p>
     <?php
 }
- 
+
 // pill field cb
- 
+
 // field callbacks can accept an $args parameter, which is an array.
 // $args is defined at the add_settings_field() function.
 // wordpress has magic interaction with the following keys: label_for, class.
@@ -346,36 +334,36 @@ function tdf_section_developers_cb($args)
 // you can add custom key value pairs to be used inside your callbacks.
 function tdf_field_pill_cb($args)
 {
- // get the value of the setting we've registered with register_setting()
+    // get the value of the setting we've registered with register_setting()
     $options = get_option('tdf_options');
- // output the field
+    // output the field
     ?>
- <select id="<?php echo esc_attr($args['label_for']); ?>"
- data-custom="<?php echo esc_attr($args['tdf_custom_data']); ?>"
- name="tdf_options[<?php echo esc_attr($args['label_for']); ?>]"
- >
- <option value="red" <?php echo isset($options[ $args['label_for'] ]) ? ( selected($options[ $args['label_for'] ], 'red', false) ) : ( '' ); ?>>
-    <?php esc_html_e('red pill', 'tdf'); ?>
- </option>
- <option value="blue" <?php echo isset($options[ $args['label_for'] ]) ? ( selected($options[ $args['label_for'] ], 'blue', false) ) : ( '' ); ?>>
-    <?php esc_html_e('blue pill', 'tdf'); ?>
- </option>
- </select>
- <p class="description">
-    <?php esc_html_e('You take the blue pill and the story ends. You wake in your bed and you believe whatever you want to believe.', 'tdf'); ?>
- </p>
- <p class="description">
-    <?php esc_html_e('You take the red pill and you stay in Wonderland and I show you how deep the rabbit-hole goes.', 'tdf'); ?>
- </p>
+    <select id="<?php echo esc_attr($args['label_for']); ?>"
+        data-custom="<?php echo esc_attr($args['tdf_custom_data']); ?>"
+        name="tdf_options[<?php echo esc_attr($args['label_for']); ?>]"
+        >
+        <option value="red" <?php echo isset($options[ $args['label_for'] ]) ? ( selected($options[ $args['label_for'] ], 'red', false) ) : ( '' ); ?>>
+            <?php esc_html_e('red pill', 'tdf'); ?>
+        </option>
+        <option value="blue" <?php echo isset($options[ $args['label_for'] ]) ? ( selected($options[ $args['label_for'] ], 'blue', false) ) : ( '' ); ?>>
+            <?php esc_html_e('blue pill', 'tdf'); ?>
+        </option>
+    </select>
+    <p class="description">
+        <?php esc_html_e('You take the blue pill and the story ends. You wake in your bed and you believe whatever you want to believe.', 'tdf'); ?>
+    </p>
+    <p class="description">
+        <?php esc_html_e('You take the red pill and you stay in Wonderland and I show you how deep the rabbit-hole goes.', 'tdf'); ?>
+    </p>
     <?php
 }
- 
+
 /**
- * top level menu
- */
+* top level menu
+*/
 function tdf_options_page()
 {
- // add top level menu page
+    // add top level menu page
     add_menu_page(
         'TechDevFan Options',
         'TechDevFan',
@@ -384,50 +372,51 @@ function tdf_options_page()
         'tdf_options_page_html'
     );
 }
- 
+
 /**
- * register our tdf_options_page to the admin_menu action hook
- */
+* register our tdf_options_page to the admin_menu action hook
+*/
 add_action('admin_menu', 'tdf_options_page');
- 
+
 /**
- * top level menu:
- * callback functions
- */
+* top level menu:
+* callback functions
+*/
 function tdf_options_page_html()
 {
- // check user capabilities
+    // check user capabilities
     if (! current_user_can('manage_options')) {
         return;
     }
- 
- // add error/update messages
- 
- // check if the user have submitted the settings
- // wordpress will add the "settings-updated" $_GET parameter to the url
+
+// add error/update messages
+
+// check if the user have submitted the settings
+// wordpress will add the "settings-updated" $_GET parameter to the url
     if (isset($_GET['settings-updated'])) {
     // add settings saved message with the class of "updated"
         add_settings_error('tdf_messages', 'tdf_message', __('Settings Saved', 'tdf'), 'updated');
     }
- 
- // show error/update messages
-    settings_errors('tdf_messages');
-    ?>
 
-    <div class="wrap">
+// show error/update messages
+    settings_errors('tdf_messages');
+?>
+
+<div class="wrap">
     <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+    <!-- <h1>"TEST HEADING"</h1> -->
     <form action="options.php" method="post">
-    <?php
- // output security fields for the registered setting "tdf"
-    settings_fields('tdf');
- // output setting sections and their fields
- // (sections are registered for "tdf", each field is registered to a specific section)
-    do_settings_sections('tdf');
- // output save settings button
-    submit_button('Save Settings');
-    ?>
- </form>
- </div>
-    <?php
+        <?php
+        // output security fields for the registered setting "tdf"
+        settings_fields('tdf');
+        // output setting sections and their fields
+        // (sections are registered for "tdf", each field is registered to a specific section)
+        do_settings_sections('tdf');
+        // output save settings button
+        submit_button('Save Settings');
+        ?>
+    </form>
+</div>
+<?php
 }
 
